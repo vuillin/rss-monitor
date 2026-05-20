@@ -9,7 +9,8 @@ const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
-  ".json": "application/json; charset=utf-8"
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml; charset=utf-8"
 };
 
 const server = http.createServer(async (request, response) => {
@@ -54,12 +55,18 @@ async function handleFeedRequest(requestUrl, response) {
     return;
   }
 
-  const feedResponse = await fetch(parsedUrl, {
-    headers: {
-      "accept": "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
-      "user-agent": "rss-monitor/0.1"
-    }
-  });
+  let feedResponse;
+  try {
+    feedResponse = await fetch(parsedUrl, {
+      headers: {
+        "accept": "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
+        "user-agent": "Mozilla/5.0 (compatible; rss-monitor/0.1; +https://localhost)"
+      }
+    });
+  } catch (error) {
+    sendJson(response, 502, { error: `Impossible de joindre le flux : ${error.message}` });
+    return;
+  }
 
   if (!feedResponse.ok) {
     sendJson(response, 502, { error: `Le flux a repondu avec le statut ${feedResponse.status}.` });
@@ -97,26 +104,25 @@ async function serveStaticFile(urlPath, response) {
 }
 
 function parseFeed(xml) {
-  const channel = getTagContent(xml, "channel") || xml;
-  const feedTitle = cleanText(getTagContent(channel, "title"));
   const itemBlocks = getTagContents(xml, "item");
   const entryBlocks = getTagContents(xml, "entry");
   const blocks = itemBlocks.length > 0 ? itemBlocks : entryBlocks;
 
   return {
-    title: feedTitle,
     items: blocks.map(parseFeedItem).filter((item) => item.title || item.link)
   };
 }
 
 function parseFeedItem(block) {
   const linkTag = getOpeningTag(block, "link");
+  const rawDescription = getTagContent(block, "description") || getTagContent(block, "summary") || getTagContent(block, "content") || getTagContent(block, "content:encoded");
 
   return {
     title: cleanText(getTagContent(block, "title")),
     link: cleanText(getTagContent(block, "link")) || getAttribute(linkTag, "href"),
+    comments: cleanText(getTagContent(block, "comments")),
     pubDate: cleanText(getTagContent(block, "pubDate") || getTagContent(block, "published") || getTagContent(block, "updated")),
-    description: cleanText(stripHtml(getTagContent(block, "description") || getTagContent(block, "summary") || getTagContent(block, "content") || getTagContent(block, "content:encoded")))
+    description: cleanHtmlText(rawDescription)
   };
 }
 
@@ -144,6 +150,19 @@ function cleanText(value) {
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
     .replace(/\s+/g, " ")
     .trim());
+}
+
+function cleanHtmlText(value) {
+  const html = cleanText(value)
+    .replace(/<p>\s*Article URL:[\s\S]*?<\/p>/gi, "")
+    .replace(/<p>\s*Comments URL:[\s\S]*?<\/p>/gi, "");
+
+  const text = cleanText(stripHtml(html))
+    .replace(/\bArticle URL:\s*/i, "")
+    .replace(/\bComments URL:\s*Comments\b/i, "")
+    .trim();
+
+  return text.toLowerCase() === "comments" ? "" : text;
 }
 
 function stripHtml(value) {
