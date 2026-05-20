@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+:root {
+  --accent: #6e7681;
+  --accent-soft: rgba(110, 118, 129, 0.16);
+  --accent-line: rgba(110, 118, 129, 0.38);
+  --accent-line-strong: rgba(139, 148, 158, 0.42);
+  --accent-text: #c9d1d9;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -14,15 +22,8 @@ body {
 .app {
   width: min(1100px, calc(100% - 32px));
   margin: 0 auto;
+  margin-top: 20px;
   padding: 32px 0;
-}
-
-.app-header {
-  margin-bottom: 24px;
-}
-
-.app-title {
-  margin: 0;
 }
 
 .status {
@@ -35,7 +36,8 @@ body {
 
 .feed-header {
   width: min(1100px, calc(100% - 32px));
-  margin: 0 auto 16px;
+  margin-left: 1%;
+  margin-bottom: 20px;
 }
 
 .feed-title-row {
@@ -80,11 +82,11 @@ body {
   margin: 0 auto 18px;
   background: linear-gradient(
     90deg,
-    rgba(255, 102, 0, 0.14),
-    rgba(255, 129, 44, 0.32),
-    rgba(255, 102, 0, 0.2),
-    rgba(255, 155, 82, 0.28),
-    rgba(255, 102, 0, 0.14)
+    transparent,
+    var(--accent-line),
+    var(--accent-line-strong),
+    var(--accent-line),
+    transparent
   );
   background-size: 180% 100%;
   animation: feed-divider-flow 10s ease-in-out infinite;
@@ -93,6 +95,34 @@ body {
 .feed-result {
   width: 100vw;
   margin-left: calc(50% - 50vw);
+}
+
+.feed-section + .feed-section {
+  margin-top: 42px;
+}
+
+.feed-theme-hacker-news {
+  --accent: #ff6600;
+  --accent-soft: rgba(255, 102, 0, 0.13);
+  --accent-line: rgba(255, 102, 0, 0.34);
+  --accent-line-strong: rgba(255, 129, 44, 0.38);
+  --accent-text: #ffb47f;
+}
+
+.feed-theme-ars-technica {
+  --accent: #ff4e00;
+  --accent-soft: rgba(255, 78, 0, 0.13);
+  --accent-line: rgba(255, 78, 0, 0.34);
+  --accent-line-strong: rgba(255, 112, 48, 0.38);
+  --accent-text: #ffb08a;
+}
+
+.feed-theme-github {
+  --accent: #7c3aed;
+  --accent-soft: rgba(124, 58, 237, 0.14);
+  --accent-line: rgba(124, 58, 237, 0.34);
+  --accent-line-strong: rgba(88, 166, 255, 0.34);
+  --accent-text: #d8b4fe;
 }
 
 @keyframes feed-divider-flow {
@@ -156,7 +186,7 @@ body {
   overflow: hidden;
   border-radius: 14px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
+    linear-gradient(145deg,rgba(255, 255, 255, 0.08),rgba(255, 255, 255, 0.04),rgba(255, 255, 255, 0.02));
   color: #f5f5f5;
   text-decoration: none;
   user-select: none;
@@ -216,7 +246,7 @@ body {
   display: block;
   width: 100%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(90deg, var(--accent-line), rgba(255, 255, 255, 0.07));
 }
 
 .article-title {
@@ -238,10 +268,10 @@ body {
   gap: 6px;
   flex: 0 0 auto;
   padding: 5px 9px;
-  border: 1px solid rgba(255, 102, 0, 0.26);
+  border: 1px solid var(--accent-line);
   border-radius: 999px;
-  background: rgba(255, 102, 0, 0.12);
-  color: #ffb47f;
+  background: var(--accent-soft);
+  color: var(--accent-text);
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -258,14 +288,6 @@ body {
   width: 100%;
   height: 100%;
   fill: currentColor;
-}
-
-.article-description {
-  position: relative;
-  z-index: 1;
-  margin: auto 0 0;
-  color: #bdbdbd;
-  line-height: 1.5;
 }
 
 @media (max-width: 700px) {

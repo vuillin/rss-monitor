@@ -2,7 +2,20 @@ const FEEDS = [
   {
     url: "https://news.ycombinator.com/rss",
     title: "Hacker News",
-    image: "/hacker-news.svg"
+    image: "/hacker-news.svg",
+    theme: "hacker-news"
+  },
+  {
+    url: "https://feeds.arstechnica.com/arstechnica/index",
+    title: "Ars Technica",
+    image: "/ars-technica.png",
+    theme: "ars-technica"
+  },
+  {
+    url: "https://github.blog/feed/",
+    title: "GitHub Blog",
+    image: "/github.svg",
+    theme: "github"
   }
 ];
 
@@ -48,7 +61,8 @@ async function fetchFeed(source) {
   return {
     ...data.feed,
     title: source.title,
-    image: source.image
+    image: source.image,
+    theme: source.theme
   };
 }
 
@@ -60,6 +74,9 @@ function renderFeedError(error) {
 }
 
 function renderFeed(feed) {
+  const section = document.createElement("section");
+  section.className = `feed-section feed-theme-${feed.theme || "default"}`;
+
   const header = document.createElement("div");
   header.className = "feed-header";
 
@@ -87,12 +104,12 @@ function renderFeed(feed) {
   titleRow.append(count);
 
   header.append(titleRow);
-  result.append(header);
+  section.append(header);
 
   const divider = document.createElement("div");
   divider.className = "feed-divider";
   divider.setAttribute("aria-hidden", "true");
-  result.append(divider);
+  section.append(divider);
 
   const carousel = document.createElement("div");
   carousel.className = "article-carousel";
@@ -160,19 +177,13 @@ function renderFeed(feed) {
 
     cardLink.append(meta, separator, title);
 
-    if (item.description) {
-      const description = document.createElement("p");
-      description.className = "article-description";
-      description.textContent = item.description;
-      cardLink.append(description);
-    }
-
     listItem.append(cardLink);
     list.append(listItem);
   }
 
   carousel.append(list);
-  result.append(carousel);
+  section.append(carousel);
+  result.append(section);
 }
 
 function setStatus(message) {
