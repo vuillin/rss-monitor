@@ -10,6 +10,7 @@ const MIME_TYPES = {
   ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".png": "image/png",
   ".svg": "image/svg+xml; charset=utf-8"
 };
 
@@ -122,7 +123,8 @@ function parseFeedItem(block) {
     link: cleanText(getTagContent(block, "link")) || getAttribute(linkTag, "href"),
     comments: cleanText(getTagContent(block, "comments")),
     pubDate: cleanText(getTagContent(block, "pubDate") || getTagContent(block, "published") || getTagContent(block, "updated")),
-    description: cleanHtmlText(rawDescription)
+    description: cleanHtmlText(rawDescription),
+    image: findImageUrl(block, rawDescription)
   };
 }
 
@@ -140,9 +142,49 @@ function getOpeningTag(xml, tagName) {
   return match ? match[0] : "";
 }
 
+function getOpeningTags(xml, tagName) {
+  return [...xml.matchAll(new RegExp(`<${escapeRegExp(tagName)}\\b[^>]*>`, "gi"))].map((match) => match[0]);
+}
+
 function getAttribute(tag, attributeName) {
   const match = tag.match(new RegExp(`${escapeRegExp(attributeName)}=["']([^"']+)["']`, "i"));
   return match ? decodeEntities(match[1]) : "";
+}
+
+function findImageUrl(block, htmlContent) {
+  const candidates = [
+    ...getImageCandidatesFromTag(block, "media:content"),
+    ...getImageCandidatesFromTag(block, "media:thumbnail"),
+    ...getImageCandidatesFromTag(block, "enclosure"),
+    getImageFromHtml(htmlContent)
+  ];
+
+  return candidates.find(isHttpUrl) || "";
+}
+
+function getImageCandidatesFromTag(block, tagName) {
+  return getOpeningTags(block, tagName)
+    .filter((tag) => tagName !== "enclosure" || getAttribute(tag, "type").startsWith("image/") || looksLikeImageUrl(getAttribute(tag, "url")))
+    .map((tag) => getAttribute(tag, "url"))
+    .filter(Boolean);
+}
+
+function getImageFromHtml(htmlContent) {
+  const imgTag = getOpeningTag(String(htmlContent || ""), "img");
+  return getAttribute(imgTag, "src");
+}
+
+function isHttpUrl(value) {
+  try {
+    const url = new URL(value);
+    return ["http:", "https:"].includes(url.protocol);
+  } catch {
+    return false;
+  }
+}
+
+function looksLikeImageUrl(value) {
+  return /\.(avif|gif|jpe?g|png|webp)(\?|#|$)/i.test(value);
 }
 
 function cleanText(value) {

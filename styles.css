@@ -125,6 +125,22 @@ body {
   --accent-text: #d8b4fe;
 }
 
+.feed-theme-infoq {
+  --accent: #1f76bb;
+  --accent-soft: rgba(31, 118, 187, 0.15);
+  --accent-line: rgba(31, 118, 187, 0.36);
+  --accent-line-strong: rgba(20, 148, 75, 0.38);
+  --accent-text: #8ed7ff;
+}
+
+.feed-theme-korben {
+  --accent: #facc15;
+  --accent-soft: rgba(250, 204, 21, 0.13);
+  --accent-line: rgba(250, 204, 21, 0.34);
+  --accent-line-strong: rgba(251, 146, 60, 0.38);
+  --accent-text: #fde68a;
+}
+
 @keyframes feed-divider-flow {
   0% {
     background-position: 0% 50%;
@@ -193,6 +209,19 @@ body {
   -webkit-user-drag: none;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.article-image {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: calc(100% + 44px);
+  height: 120px;
+  margin: -22px -22px 0;
+  object-fit: cover;
+  background: #252525;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .article-card:hover,

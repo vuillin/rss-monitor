@@ -6,16 +6,28 @@ const FEEDS = [
     theme: "hacker-news"
   },
   {
+    url: "https://github.blog/feed/",
+    title: "GitHub Blog",
+    image: "/github.svg",
+    theme: "github"
+  },
+  {
     url: "https://feeds.arstechnica.com/arstechnica/index",
     title: "Ars Technica",
     image: "/ars-technica.png",
     theme: "ars-technica"
   },
   {
-    url: "https://github.blog/feed/",
-    title: "GitHub Blog",
-    image: "/github.svg",
-    theme: "github"
+    url: "https://korben.info/feed",
+    title: "Korben",
+    image: "/korben.svg",
+    theme: "korben"
+  },
+  {
+    url: "https://feed.infoq.com/",
+    title: "InfoQ",
+    image: "/infoq.png",
+    theme: "infoq"
   }
 ];
 
@@ -129,6 +141,19 @@ function renderFeed(feed) {
     cardLink.rel = "noreferrer";
     cardLink.draggable = false;
     cardLink.setAttribute("aria-label", item.title || "Article sans titre");
+
+    if (item.image) {
+      const image = document.createElement("img");
+      image.className = "article-image";
+      image.src = item.image;
+      image.alt = "";
+      image.loading = "lazy";
+      image.draggable = false;
+      image.addEventListener("error", () => {
+        image.remove();
+      });
+      cardLink.append(image);
+    }
 
     const meta = document.createElement("div");
     meta.className = "article-meta";
