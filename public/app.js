@@ -1,35 +1,4 @@
-const FEEDS = [
-  {
-    url: "https://news.ycombinator.com/rss",
-    title: "Hacker News",
-    image: "/hacker-news.svg",
-    theme: "hacker-news"
-  },
-  {
-    url: "https://github.blog/feed/",
-    title: "GitHub Blog",
-    image: "/github.svg",
-    theme: "github"
-  },
-  {
-    url: "https://feeds.arstechnica.com/arstechnica/index",
-    title: "Ars Technica",
-    image: "/ars-technica.png",
-    theme: "ars-technica"
-  },
-  {
-    url: "https://korben.info/feed",
-    title: "Korben",
-    image: "/korben.svg",
-    theme: "korben"
-  },
-  {
-    url: "https://feed.infoq.com/",
-    title: "InfoQ",
-    image: "/infoq.png",
-    theme: "infoq"
-  }
-];
+const FEEDS = window.RSS_MONITOR_FEEDS || [];
 
 const statusText = document.querySelector("#status");
 const result = document.querySelector("#feed-result");
